@@ -41,7 +41,7 @@ after_success:
   - docker tag udagram-api-feed niladribora/udagram-api-feed:latest
   - docker tag udagram-frontend niladribora/udagram-frontend:latest
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push niladribora/reverseproxy:local
+  - docker push niladribora/reverseproxy:latest
   - docker push niladribora/udagram-api-user:latest
   - docker push niladribora/udagram-api-feed:latest
   - docker push niladribora/udagram-frontend:latest
