@@ -11,6 +11,9 @@ log.txt
 *.sublime-workspace
 .vscode/
 npm-debug.log*
+.aws_secrets
+aws-secrets.yaml
+env-configmap.yaml
 
 .env
 .idea/
