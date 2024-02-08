@@ -1,0 +1,47 @@
+dist: focal
+language: node_js
+node_js:
+  - 13
+
+services:
+  - docker
+
+env:
+  - DOCKER_COMPOSE_VERSION=v2.23.3
+
+before_install:
+  - sudo systemctl stop docker.service && sudo systemctl stop docker.socket
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - yes | sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+  - sudo systemctl start docker
+  
+# Pre-testing installs
+install:
+  - echo "nothing needs to be installed"
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+# Scripts to be run such as tests
+before_script:
+  - echo "no tests"
+
+script:
+  - docker --version # print the version for logging
+#  - docker build -t simple-node .
+  - docker-compose -f docker-compose-build.yaml build 
+
+# Tasks to perform after the process is successful. Formatting the Docker username and password as below enables you to programmatically log in without having the password exposed in logs.
+after_success:
+  - docker tag reverseproxy niladribora/reverseproxy:latest
+  - docker tag udagram-api-user niladribora/udagram-api-user:latest
+  - docker tag udagram-api-feed niladribora/udagram-api-feed:latest
+  - docker tag udagram-frontend:local niladribora/udagram-frontend:latest
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push niladribora/reverseproxy:latest
+  - docker push niladribora/udagram-api-user:latest
+  - docker push niladribora/udagram-api-feed:latest
+  - docker push niladribora/udagram-frontend:latest
